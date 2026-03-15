@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEU Library Visitor Log</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --neu-navy: #0d1b3e;
+    --neu-gold: #c9a84c;
+    --neu-gold-light: #f0d080;
+    --neu-cream: #faf7f0;
+    --neu-red: #c0392b;
+    --neu-green: #1a6b3c;
+    --card-bg: #ffffff;
+    --shadow: 0 4px 24px rgba(13,27,62,0.10);
+    --radius: 14px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+ body {
+  font-family: 'DM Sans', sans-serif;
+  background-image: url("pictures_logo/cropped-facade.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: var(--neu-navy);
+  min-height: 100vh;
+}
+
+  /* ── HEADER ── */
+  header {
+    background: var(--neu-navy);
+    color: #fff;
+    padding: 0 40px;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 68px;
+    box-shadow: 0 2px 16px rgba(13,27,62,0.18);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .logo { display: flex; align-items: center; gap: 14px; }
+  .logo-icon {
+    width: 42px; height: 42px; background: var(--neu-gold);
+    border-radius: 8px; display: flex; align-items: center; justify-content: center;
+    font-family: 'Playfair Display', serif; font-weight: 700; font-size: 20px; color: var(--neu-navy);
+  }
+  .logo-text { font-family: 'Playfair Display', serif; font-size: 1.18rem; font-weight: 700; letter-spacing: 0.02em; }
+  .logo-sub { font-size: 0.72rem; opacity: 0.65; letter-spacing: 0.07em; text-transform: uppercase; }
+  .header-nav { display: flex; gap: 8px; align-items: center; }
+  .nav-btn {
+    background: transparent; border: 1.5px solid rgba(201,168,76,0.4); color: var(--neu-gold);
+    padding: 7px 18px; border-radius: 8px; cursor: pointer; font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem; font-weight: 500; transition: all 0.18s;
+  }
+  .nav-btn:hover, .nav-btn.active { background: var(--neu-gold); color: var(--neu-navy); border-color: var(--neu-gold); }
+
+  /* ── PAGES ── */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ══ LOGIN PAGE ══ */
+  .login-wrap {
+  min-height: calc(100vh - 68px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-image: url("pictures logo/cropped-facade.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  }
+  .login-card {
+    background: #fff; border-radius: 20px;
+    padding: 48px 44px; width: 100%; max-width: 460px;
+    box-shadow: 0 20px 60px rgba(13,27,62,0.25);
+    animation: fadeUp 0.5s ease;
+  }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+  .login-card h2 { font-family: 'Playfair Display', serif; font-size: 1.7rem; color: var(--neu-navy); margin-bottom: 4px; }
+  .login-card p { color: #6b7280; font-size: 0.9rem; margin-bottom: 28px; }
+  .form-group { margin-bottom: 18px; }
+  .form-group label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--neu-navy); margin-bottom: 6px; letter-spacing: 0.04em; text-transform: uppercase; }
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%; padding: 11px 14px; border: 1.5px solid #e5e7eb;
+    border-radius: 9px; font-family: 'DM Sans', sans-serif; font-size: 0.93rem;
+    color: var(--neu-navy); background: #fafafa; transition: border 0.18s;
+    outline: none;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--neu-gold); background: #fff; }
+  .form-group textarea { resize: vertical; min-height: 80px; }
+  .btn-primary {
+    width: 100%; padding: 13px; background: var(--neu-navy); color: #fff;
+    border: none; border-radius: 9px; font-family: 'DM Sans', sans-serif;
+    font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.18s;
+    letter-spacing: 0.03em;
+  }
+  .btn-primary:hover { background: #1a2f5e; }
+  .btn-gold {
+    padding: 10px 22px; background: var(--neu-gold); color: var(--neu-navy);
+    border: none; border-radius: 9px; font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: background 0.18s;
+  }
+  .btn-gold:hover { background: var(--neu-gold-light); }
+  .btn-outline {
+    padding: 10px 22px; background: transparent; color: var(--neu-navy);
+    border: 1.5px solid #d1d5db; border-radius: 9px; font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.18s;
+  }
+  .btn-outline:hover { border-color: var(--neu-navy); background: #f3f4f6; }
+  .divider { text-align: center; color: #9ca3af; font-size: 0.8rem; margin: 16px 0; position: relative; }
+  .divider::before, .divider::after { content: ''; position: absolute; top: 50%; width: 40%; height: 1px; background: #e5e7eb; }
+  .divider::before { left: 0; } .divider::after { right: 0; }
+  .error-msg { background: #fef2f2; color: var(--neu-red); padding: 10px 14px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 14px; display: none; }
+  .error-msg.show { display: block; }
+  .blocked-msg { background: #fef2f2; color: var(--neu-red); padding: 18px; border-radius: 12px; text-align: center; }
+  .blocked-msg strong { display: block; font-size: 1.1rem; margin-bottom: 4px; }
+
+  /* ══ WELCOME PAGE ══ */
+ .welcome-wrap {
+  min-height: calc(100vh - 68px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background-image: url("pictures logo/cropped-facade.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+  .welcome-card {
+    background: #fff; border-radius: 20px; padding: 52px 48px;
+    width: 100%; max-width: 520px; text-align: center;
+    box-shadow: 0 20px 60px rgba(13,27,62,0.25);
+    animation: fadeUp 0.5s ease;
+  }
+  .welcome-icon {
+    width: 72px; height: 72px; background: linear-gradient(135deg, var(--neu-gold), var(--neu-gold-light));
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 32px; margin: 0 auto 20px; box-shadow: 0 4px 20px rgba(201,168,76,0.3);
+  }
+  .welcome-card h2 { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--neu-navy); margin-bottom: 8px; }
+  .welcome-card .visitor-name { color: var(--neu-gold); font-weight: 700; }
+  .welcome-card .program-tag {
+    display: inline-block; background: var(--neu-navy); color: var(--neu-gold);
+    padding: 5px 16px; border-radius: 20px; font-size: 0.82rem; font-weight: 600; margin: 10px 0 18px;
+    letter-spacing: 0.05em; text-transform: uppercase;
+  }
+  .welcome-card .reason-tag {
+    display: inline-block; background: #f3f4f6; color: #374151;
+    padding: 6px 16px; border-radius: 20px; font-size: 0.85rem; margin-bottom: 28px;
+  }
+  .welcome-card .library-msg {
+    font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--neu-navy);
+    font-weight: 700; margin-bottom: 28px;
+  }
+
+  /* ══ ADMIN DASHBOARD ══ */
+  .dashboard-wrap { padding: 36px 40px; max-width: 1280px; margin: 0 auto; }
+  .dash-title { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--neu-navy); margin-bottom: 4px; }
+  .dash-subtitle { color: #6b7280; font-size: 0.9rem; margin-bottom: 28px; }
+
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 18px; margin-bottom: 32px; }
+  .stat-card {
+    background: #fff; border-radius: var(--radius); padding: 22px 24px;
+    box-shadow: var(--shadow); border-top: 4px solid var(--neu-gold);
+    transition: transform 0.18s;
+  }
+  .stat-card:hover { transform: translateY(-2px); }
+  .stat-card .stat-label { font-size: 0.75rem; font-weight: 600; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 8px; }
+  .stat-card .stat-value { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 700; color: var(--neu-navy); }
+  .stat-card .stat-sub { font-size: 0.8rem; color: #6b7280; margin-top: 4px; }
+
+  .filter-bar {
+    background: #fff; border-radius: var(--radius); padding: 20px 24px;
+    box-shadow: var(--shadow); margin-bottom: 24px;
+    display: flex; gap: 14px; align-items: flex-end; flex-wrap: wrap;
+  }
+  .filter-bar .form-group { margin-bottom: 0; flex: 1; min-width: 160px; }
+  .search-box {
+    flex: 2; min-width: 220px;
+    position: relative;
+  }
+  .search-box input { padding-left: 38px; }
+  .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #9ca3af; font-size: 15px; }
+
+  .table-card { background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .table-header { padding: 20px 24px; border-bottom: 1px solid #f3f4f6; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+  .table-header h3 { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--neu-navy); }
+  table { width: 100%; border-collapse: collapse; }
+  th { background: #f9fafb; padding: 12px 16px; text-align: left; font-size: 0.75rem; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.07em; }
+  td { padding: 13px 16px; border-top: 1px solid #f3f4f6; font-size: 0.88rem; vertical-align: middle; }
+  tr:hover td { background: #fafafa; }
+  .badge {
+    display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.73rem; font-weight: 600;
+  }
+  .badge-student { background: #dbeafe; color: #1e40af; }
+  .badge-faculty { background: #d1fae5; color: #065f46; }
+  .badge-employee { background: #fef3c7; color: #92400e; }
+  .badge-blocked { background: #fee2e2; color: #991b1b; }
+  .badge-active { background: #d1fae5; color: #065f46; }
+  .btn-block { padding: 5px 12px; background: #fee2e2; color: #991b1b; border: none; border-radius: 6px; cursor: pointer; font-size: 0.78rem; font-weight: 600; }
+  .btn-unblock { padding: 5px 12px; background: #d1fae5; color: #065f46; border: none; border-radius: 6px; cursor: pointer; font-size: 0.78rem; font-weight: 600; }
+  .empty-row td { text-align: center; color: #9ca3af; padding: 32px; }
+
+  .tab-bar { display: flex; gap: 8px; margin-bottom: 24px; }
+  .tab { padding: 9px 20px; border-radius: 8px; border: 1.5px solid #e5e7eb; background: #fff; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 500; color: #6b7280; transition: all 0.18s; }
+  .tab.active { background: var(--neu-navy); color: #fff; border-color: var(--neu-navy); }
+
+  /* PDF hint */
+  .pdf-note { font-size: 0.8rem; color: #9ca3af; }
+
+  @media (max-width: 600px) {
+    .dashboard-wrap { padding: 20px 14px; }
+    .login-card { padding: 32px 20px; }
+    header { padding: 0 16px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo">
+  <img src="pictures logo/647697241_1959628431323892_2349324474619548675_n.png" style="height:45px;">
+</div>
+    <div>
+      <div class="logo-text">NEU Library</div>
+    </div>
+  </div>
+  <div class="header-nav" id="headerNav">
+  </div>
+</header>
+
+<!-- ═══ LOGIN PAGE ═══ -->
+<div class="page active" id="page-login">
+  <div class="login-wrap">
+    <div class="login-card">
+      <h2>Welcome, Visitor</h2>
+      <p>Please sign in to access the NEU Library.</p>
+      <div class="error-msg" id="loginError"></div>
+      <div class="form-group">
+        <label>Institutional Email</label>
+        <input type="text" id="loginId" placeholder="Enter Google email (@neu.edu.ph)">
+      </div>
+      <div class="form-group">
+  <label>Program / Department</label>
+  <select id="loginProgram">
+    <option value="">— Select program —</option>
+    <optgroup label="College of Engineering">
+      <option value="BS Computer Engineering">BS Computer Engineering</option>
+      <option value="BS Electronics Engineering">BS Electronics Engineering</option>
+      <option value="BS Electrical Engineering">BS Electrical Engineering</option>
+    </optgroup>
+    <optgroup label="College of Computing">
+      <option value="BS Computer Science">BS Computer Science</option>
+      <option value="BS Information Technology">BS Information Technology</option>
+      <option value="BS Information Systems">BS Information Systems</option>
+    </optgroup>
+    <optgroup label="College of Business">
+      <option value="BS Accountancy">BS Accountancy</option>
+      <option value="BS Business Administration">BS Business Administration</option>
+      <option value="BS Entrepreneurship">BS Entrepreneurship</option>
+    </optgroup>
+    <optgroup label="College of Education">
+      <option value="Bachelor of Elementary Education">Bachelor of Elementary Education</option>
+      <option value="Bachelor of Secondary Education">Bachelor of Secondary Education</option>
+    </optgroup>
+    <optgroup label="College of Nursing">
+      <option value="BS Nursing">BS Nursing</option>
+    </optgroup>
+    <optgroup label="Faculty / Staff">
+      <option value="Faculty">Faculty</option>
+      <option value="Administrative Staff">Administrative Staff</option>
+      <option value="Non-Teaching Staff">Non-Teaching Staff</option>
+    </optgroup>
+    <option value="Other">Other</option>
+  </select>
+</div>
+      <div class="form-group">
+        <label>Reason for Visit</label>
+        <select id="loginReason">
+          <option value="">— Select reason —</option>
+          <option value="Reading">Reading</option>
+          <option value="Researching">Researching</option>
+          <option value="Use of Computer">Use of Computer</option>
+          <option value="Meeting">Meeting</option>
+          <option value="Studying">Studying</option>
+          <option value="Borrowing Books">Borrowing Books</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <button class="btn-primary" onclick="doLogin()">Sign In to Library</button>
+      <div class="divider">or</div>
+      <button class="btn-outline" style="width:100%;" onclick="showAdminLogin()">Admin Dashboard →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ADMIN LOGIN PAGE ═══ -->
+<div class="page" id="page-adminlogin">
+  <div class="login-wrap">
+    <div class="login-card">
+      <h2>Admin Login</h2>
+      <p>NEU Library Administration Portal.</p>
+      <div class="error-msg" id="adminError"></div>
+      <div class="form-group">
+        <label>Admin Username</label>
+        <input type="text" id="adminUser" placeholder="admin">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="adminPass" placeholder="••••••••">
+      </div>
+      <button class="btn-primary" onclick="doAdminLogin()">Login as Admin</button>
+      <div class="divider">or</div>
+      <button class="btn-outline" style="width:100%;" onclick="showPage('login')">← Back to Visitor Login</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ WELCOME PAGE ═══ -->
+<div class="page" id="page-welcome">
+  <div class="welcome-wrap">
+    <div class="welcome-card">
+      <div class="welcome-icon">📚</div>
+      <h2>Hello, <span class="visitor-name" id="welcomeName"></span>!</h2>
+      <div class="program-tag" id="welcomeProgram"></div>
+      <div class="reason-tag">📌 Purpose: <span id="welcomeReason"></span></div>
+      <div class="library-msg">"Welcome to NEU Library!"</div>
+      <button class="btn-primary" onclick="showPage('login')" style="max-width:220px;margin:0 auto;">Sign Out</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ADMIN DASHBOARD ═══ -->
+<div class="page" id="page-admin">
+  <div class="dashboard-wrap">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:24px;">
+      <div>
+        <div class="dash-title">Library Dashboard</div>
+        <div class="dash-subtitle">Visitor statistics and management</div>
+      </div>
+      <button class="btn-outline" onclick="adminLogout()">← Logout</button>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Today</div>
+        <div class="stat-value" id="statToday">0</div>
+        <div class="stat-sub">visitors today</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">This Week</div>
+        <div class="stat-value" id="statWeek">0</div>
+        <div class="stat-sub">visitors this week</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">This Month</div>
+        <div class="stat-value" id="statMonth">0</div>
+        <div class="stat-sub">visitors this month</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total Visits</div>
+        <div class="stat-value" id="statTotal">0</div>
+        <div class="stat-sub">all time</div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tab-bar">
+      <button class="tab active" onclick="switchTab('visits',this)">All Visits</button>
+      <button class="tab" onclick="switchTab('users',this)">Manage Users</button>
+    </div>
+
+    <!-- Visits Tab -->
+    <div id="tab-visits">
+      <div class="filter-bar">
+        <div class="search-box form-group">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="searchBox" placeholder="Search by name, program, reason…" oninput="renderVisits()">
+        </div>
+        <div class="form-group">
+          <label>Date From</label>
+          <input type="date" id="filterFrom" onchange="renderVisits()">
+        </div>
+        <div class="form-group">
+          <label>Date To</label>
+          <input type="date" id="filterTo" onchange="renderVisits()">
+        </div>
+        <button class="btn-gold" onclick="printToPDF()">⬇ Export PDF</button>
+      </div>
+      <div class="table-card">
+        <div class="table-header">
+  <h3>Visit Log</h3>
+  <div style="display:flex;gap:10px;align-items:center;">
+    <span class="pdf-note" id="visitsCount"></span>
+    <button class="btn-block" style="padding:7px 16px;font-size:0.82rem;border-radius:8px;" onclick="clearAllVisits()">🗑 Clear All</button>
+  </div>
+</div>
+        </div>
+        <div style="overflow-x:auto;">
+          <table id="visitsTable">
+            <thead>
+              <tr>
+                <th>#</th><th>Name</th><th>Type</th><th>Program/Dept</th><th>Reason</th><th>Date & Time</th><th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="visitsBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Users Tab -->
+    <div id="tab-users" style="display:none;">
+      <div class="filter-bar">
+        <div class="form-group" style="flex:1;">
+          <label>Search Users</label>
+           <input type="text" id="userSearch" placeholder="Search by name or email…" oninput="renderUsers()">
+        </div>
+      </div>
+      <div class="table-card">
+        <div class="table-header"><h3>Registered Visitors</h3></div>
+        <div style="overflow-x:auto;">
+          <table>
+            <thead>
+              <tr><th>Name</th><th>Email / RFID</th><th>Type</th><th>Program</th><th>Total Visits</th><th>Status</th><th>Action</th></tr>
+            </thead>
+            <tbody id="usersBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCor0snf1Q3mzWC_iO7Ek6KEoD6p61k66E",
+  authDomain: "neu-library-log-8105f.firebaseapp.com",
+  projectId: "neu-library-log-8105f",
+  storageBucket: "neu-library-log-8105f.firebasestorage.app",
+  messagingSenderId: "249247467661",
+  appId: "1:249247467661:web:2806137c5cdb0154abbac4",
+  measurementId: "G-S4MZN7Q47V"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// ── Save a visit to Firestore ──
+window.saveVisit = async function(visitor) {
+  try {
+    await addDoc(collection(db, "visits"), visitor);
+    console.log("Visit saved!");
+  } catch (e) {
+    console.error("Error saving visit:", e);
+  }
+};
+
+// ── Fetch and display visits from Firestore ──
+window.renderVisits = async function() {
+  const tbody = document.getElementById("visitsBody");
+  tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#9ca3af;padding:24px;">Loading...</td></tr>';
+
+  try {
+    const search = (document.getElementById('searchBox')?.value || '').toLowerCase();
+    const from   = document.getElementById('filterFrom')?.value;
+    const to     = document.getElementById('filterTo')?.value;
+
+    const q = query(collection(db, "visits"), orderBy("datetime", "desc"));
+    const snapshot = await getDocs(q);
+
+    let rows = [];
+    let count = 1;
+
+    snapshot.forEach((docSnap) => {
+      const d = docSnap.data();
+      const docId = docSnap.id;
+
+      if (search && !d.name?.toLowerCase().includes(search) &&
+          !d.program?.toLowerCase().includes(search) &&
+          !d.reason?.toLowerCase().includes(search)) return;
+
+      const visitDate = d.datetime?.slice(0, 10);
+      if (from && visitDate < from) return;
+      if (to   && visitDate > to)   return;
+
+      rows.push(`
+        <tr id="row-${docId}">
+          <td>${count++}</td>
+          <td><strong>${d.name || '—'}</strong><br>
+            <span style="font-size:0.78rem;color:#6b7280;">${d.email || ''}</span>
+          </td>
+          <td><span class="badge badge-${d.type || 'student'}">${d.type || 'student'}</span></td>
+          <td>${d.program || '—'}</td>
+          <td>${d.reason || '—'}</td>
+          <td>${d.datetime ? new Date(d.datetime).toLocaleString('en-PH') : '—'}</td>
+          <td><span class="badge badge-active">Active</span></td>
+          <td>
+            <button class="btn-block" style="padding:5px 12px;font-size:0.78rem;" 
+              onclick="deleteVisit('${docId}')">Delete</button>
+          </td>
+        </tr>
+      `);
+    });
+
+    tbody.innerHTML = rows.length
+      ? rows.join('')
+      : '<tr class="empty-row"><td colspan="8">No records found.</td></tr>';
+
+    document.getElementById('visitsCount').textContent = `${rows.length} record(s)`;
+    await updateStats();
+
+  } catch(e) {
+    console.error("Error fetching visits:", e);
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="8">Error loading data. Check Firestore rules.</td></tr>';
+  }
+};
+window.deleteVisit = async function(docId) {
+  openDeleteModal(
+    'Delete this record?',
+    'This visit entry will be permanently removed from the log and cannot be recovered.',
+    async () => {
+      try {
+        await deleteDoc(doc(db, "visits", docId));
+        const row = document.getElementById('row-' + docId);
+        if (row) row.remove();
+        const remaining = document.getElementById('visitsBody').querySelectorAll('tr:not(.empty-row)').length;
+        document.getElementById('visitsCount').textContent = `${remaining} record(s)`;
+        await updateStats();
+      } catch(e) {
+        console.error("Delete error:", e);
+      }
+    }
+  );
+};
+
+window.clearAllVisits = async function() {
+  openDeleteModal(
+    'Clear all records?',
+    'Every visit entry will be permanently deleted. This action cannot be undone.',
+    async () => {
+      try {
+        const snapshot = await getDocs(collection(db, "visits"));
+        const deletes = [];
+        snapshot.forEach(docSnap => deletes.push(deleteDoc(doc(db, "visits", docSnap.id))));
+        await Promise.all(deletes);
+        document.getElementById('visitsBody').innerHTML =
+          '<tr class="empty-row"><td colspan="8">No records found.</td></tr>';
+        document.getElementById('visitsCount').textContent = '0 record(s)';
+        await updateStats();
+      } catch(e) {
+        console.error("Clear error:", e);
+      }
+    }
+  );
+};
+// ── Update stats from Firestore ──
+window.updateStats = async function() {
+  try {
+    const snapshot = await getDocs(collection(db, "visits"));
+    const now = new Date();
+    const todayStr = now.toISOString().slice(0,10);
+    const weekAgo  = new Date(now - 7*86400000);
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    let today = 0, week = 0, month = 0, total = 0;
+
+    snapshot.forEach(doc => {
+      const d = doc.data();
+      if (!d.datetime) return;
+      const dt = new Date(d.datetime);
+      total++;
+      if (d.datetime.startsWith(todayStr)) today++;
+      if (dt >= weekAgo)   week++;
+      if (dt >= monthStart) month++;
+    });
+
+    document.getElementById('statToday').textContent = today;
+    document.getElementById('statWeek').textContent  = week;
+    document.getElementById('statMonth').textContent = month;
+    document.getElementById('statTotal').textContent = total;
+  } catch(e) {
+    console.error("Stats error:", e);
+  }
+};
+
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        console.log("Admin signed in:", user.email);
+        showPage('admin');
+        loadVisits();
+        updateStats();
+        renderVisits();
+        renderUsers();
+    } else {
+        console.log("No admin signed in.");
+        showPage('login');
+    }
+});
+
+  window.db = db;
+  window.collection = collection;
+  window.addDoc = addDoc;
+  window.getDocs = getDocs;
+  window.deleteDoc = deleteDoc;
+  window.doc = doc;
+ window.doAdminLogin = doAdminLogin;
+  window.doLogin = doLogin;             
+  window.adminLogout = adminLogout;
+  window.showPage = showPage;
+  window.showAdminLogin = showAdminLogin;
+  window.toggleBlock = toggleBlock;
+</script>
+<script>
+// ═══ DATA ═══
+window.VISITORS = [];
+
+function addVisitor(visitor) {
+    VISITORS.push(visitor);
+    visitLog.push({ visitorId: visitor.id, reason: visitor.reason, datetime: visitor.datetime });
+}
+
+let visitLog = [
+  
+];
+
+const savedLogs = localStorage.getItem("visitLog");
+if (savedLogs) 
+  visitLog = JSON.parse(savedLogs);
+// ═══ PAGE CONTROL ═══
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+}
+function showAdminLogin() { showPage('adminlogin'); }
+
+// ═══ VISITOR LOGIN ═══
+function doLogin() {
+  const id = document.getElementById('loginId').value.trim();
+  const program = document.getElementById('loginProgram').value;
+  const reason = document.getElementById('loginReason').value;
+  const errEl = document.getElementById('loginError');
+
+  if (!id) {
+    showErr(errEl, 'Please enter your NEU email.'); return;
+  }
+  if (!id.toLowerCase().endsWith("@neu.edu.ph")) {
+    showErr(errEl, 'Only NEU institutional emails are allowed.'); return;
+  }
+  if (!program) {
+    showErr(errEl, 'Please select your program or department.'); return;
+  }
+  if (!reason) {
+    showErr(errEl, 'Please select your reason for visiting.'); return;
+  }
+
+  // Determine type based on program selection
+  const facultyOptions = ['Faculty', 'Administrative Staff', 'Non-Teaching Staff'];
+  const visitorType = facultyOptions.includes(program) ? 'faculty' : 'student';
+
+  const visitor = {
+    id: id,
+    name: id.split("@")[0],
+    type: visitorType,
+    program: program,
+    blocked: false
+  };
+
+  if (typeof saveVisit === 'function') {
+    saveVisit({
+      email: visitor.id,
+      name: visitor.name,
+      program: program,
+      type: visitorType,
+      reason: reason,
+      datetime: new Date().toISOString()
+    });
+  }
+
+  errEl.classList.remove('show');
+  visitLog.push({ visitorId: visitor.id, reason, datetime: new Date().toISOString() });
+
+  document.getElementById('welcomeName').textContent = visitor.name;
+  document.getElementById('welcomeProgram').textContent = visitorType.toUpperCase() + ' — ' + program;
+  document.getElementById('welcomeReason').textContent = reason;
+
+  // Clear the form
+  document.getElementById('loginId').value = '';
+  document.getElementById('loginProgram').value = '';
+  document.getElementById('loginReason').value = '';
+
+  showPage('welcome');
+
+  setTimeout(() => {}, 100);
+}
+
+function showErr(el, msg) { el.textContent = msg; el.classList.add('show'); }
+function adminLogout() {
+    showPage('adminlogin');  // Switch back to admin login page
+    console.log("Admin logged out (local mode).");
+}
+// ═══ ADMIN LOGIN ═══
+function doAdminLogin() {
+    const username = document.getElementById('adminUser').value.trim();
+    const password = document.getElementById('adminPass').value;
+    const err = document.getElementById('adminError');
+
+    // Hardcoded credentials
+    if (username === "admin" && password === "admin123") {
+        err.classList.remove('show');
+        showPage('admin');
+        updateStats();
+        renderVisits();
+        renderUsers();
+    } else {
+        err.textContent = "Invalid admin credentials";
+        err.classList.add("show");
+    }
+}
+// ═══ STATS ═══
+function updateStats() {
+  const now = new Date();
+  const todayStr = now.toISOString().slice(0,10);
+  const weekAgo = new Date(now - 7*86400000);
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  const todayCount = visitLog.filter(v => v.datetime.startsWith(todayStr)).length;
+  const weekCount  = visitLog.filter(v => new Date(v.datetime) >= weekAgo).length;
+  const monthCount = visitLog.filter(v => new Date(v.datetime) >= monthStart).length;
+
+  document.getElementById('statToday').textContent = todayCount;
+  document.getElementById('statWeek').textContent  = weekCount;
+  document.getElementById('statMonth').textContent = monthCount;
+  document.getElementById('statTotal').textContent = visitLog.length;
+}
+
+// ═══ VISITS TABLE ═══
+async function renderVisits() {
+  const tbody = document.getElementById("visitsBody");
+  tbody.innerHTML = "";
+
+  const querySnapshot = await getDocs(collection(db, "visits"));
+
+  if (querySnapshot.empty) {
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="7">No records found.</td></tr>';
+    return;
+  }
+
+  let count = 1;
+
+  querySnapshot.forEach((doc) => {
+    const data = doc.data();
+
+    const row = `
+      <tr>
+        <td>${count++}</td>
+        <td><strong>${data.name}</strong></td>
+        <td><span class="badge badge-${data.type}">${data.type}</span></td>
+        <td>${data.program}</td>
+        <td>${data.reason}</td>
+        <td>${new Date(data.datetime).toLocaleString()}</td>
+        <td><span class="badge badge-active">Active</span></td>
+      </tr>
+    `;
+
+    tbody.innerHTML += row;
+  });
+}
+// ═══ USERS TABLE ═══
+window.renderUsers = async function() {
+  const q = document.getElementById('userSearch')?.value.toLowerCase() || '';
+  const tbody = document.getElementById('usersBody');
+  tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#9ca3af;padding:24px;">Loading...</td></tr>';
+
+  try {
+    const snapshot = await getDocs(collection(db, "visits"));
+
+    // Group visits by email — one row per unique visitor
+    const userMap = {};
+    snapshot.forEach(doc => {
+      const d = doc.data();
+      const email = d.email || d.visitorId || '—';
+      if (!userMap[email]) {
+        userMap[email] = {
+          email: email,
+          name: d.name || email.split('@')[0],
+          type: d.type || 'student',
+          program: d.program || '—',
+          blocked: false,
+          visits: 0
+        };
+      }
+      userMap[email].visits++;
+      // Use the most recent entry's program/type
+      if (d.program && d.program !== 'Unknown') userMap[email].program = d.program;
+      if (d.type) userMap[email].type = d.type;
+    });
+
+    let users = Object.values(userMap);
+
+    // Apply search filter
+    if (q) {
+      users = users.filter(v =>
+        v.name.toLowerCase().includes(q) ||
+        v.email.toLowerCase().includes(q) ||
+        v.program.toLowerCase().includes(q)
+      );
+    }
+
+    if (users.length === 0) {
+      tbody.innerHTML = '<tr class="empty-row"><td colspan="7">No users found.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = users.map(v => `
+      <tr>
+        <td><strong>${v.name}</strong></td>
+        <td style="font-size:0.82rem;color:#6b7280;">${v.email}</td>
+        <td><span class="badge badge-${v.type}">${cap(v.type)}</span></td>
+        <td>${v.program}</td>
+        <td>${v.visits}</td>
+        <td><span class="badge ${v.blocked ? 'badge-blocked' : 'badge-active'}">${v.blocked ? 'Blocked' : 'Active'}</span></td>
+        <td>
+          ${v.blocked
+            ? `<button class="btn-unblock" onclick="toggleBlock('${v.email}', false)">Unblock</button>`
+            : `<button class="btn-block" onclick="toggleBlock('${v.email}', true)">Block</button>`}
+        </td>
+      </tr>
+    `).join('');
+
+  } catch(e) {
+    console.error("Error loading users:", e);
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="7">Error loading users. Check Firestore rules.</td></tr>';
+  }
+  
+};
+
+function toggleBlock(id, block) {
+  const v = VISITORS.find(u => u.id === id);
+  if (v) { v.blocked = block; renderUsers(); renderVisits(); updateStats(); }
+}
+
+// ═══ TABS ═══
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-visits').style.display = name === 'visits' ? '' : 'none';
+  document.getElementById('tab-users').style.display  = name === 'users'  ? '' : 'none';
+}
+
+function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+function formatDate(iso) {
+  const d = new Date(iso);
+  return d.toLocaleDateString('en-PH', { month:'short', day:'numeric', year:'numeric' }) + ' ' +
+         d.toLocaleTimeString('en-PH', { hour:'2-digit', minute:'2-digit' });
+}
+</script>
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:999; align-items:center; justify-content:center;">
+  <div style="background:#fff; border-radius:20px; padding:36px 32px; width:100%; max-width:420px; box-shadow:0 20px 60px rgba(13,27,62,0.3); text-align:center;">
+    
+    <div style="width:64px; height:64px; background:#fee2e2; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 20px; font-size:28px;">🗑</div>
+    
+    <h3 style="font-family:'Playfair Display',serif; color:#0d1b3e; font-size:1.4rem; margin-bottom:8px;" id="deleteModalTitle">Delete Record?</h3>
+    <p style="color:#6b7280; font-size:0.88rem; margin-bottom:28px; line-height:1.6;" id="deleteModalMsg">This action cannot be undone.</p>
+
+    <div style="display:flex; gap:10px;">
+      <button id="deleteModalConfirmBtn" style="flex:1; padding:12px; background:#c0392b; color:#fff; border:none; border-radius:9px; font-family:'DM Sans',sans-serif; font-size:0.95rem; font-weight:600; cursor:pointer;">Yes, Delete</button>
+      <button onclick="closeDeleteModal()" style="flex:1; padding:12px; background:transparent; color:#0d1b3e; border:1.5px solid #d1d5db; border-radius:9px; font-family:'DM Sans',sans-serif; font-size:0.95rem; font-weight:500; cursor:pointer;">Cancel</button>
+    </div>
+  </div>
+
+</div>
+<footer style="background:var(--neu-navy);color:rgba(255,255,255,0.75);padding:28px 40px;font-family:'DM Sans',sans-serif;font-size:0.82rem;">
+  <div style="max-width:1280px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;">
+    <div style="display:flex;align-items:center;gap:12px;">
+  <img src="pictures logo/647697241_1959628431323892_2349324474619548675_n.png" alt="NEU Logo"
+  style="width:45px;height:45px;border-radius:6px;object-fit:contain;">
+
+  <div>
+        <div style="font-family:'Playfair Display',serif;color:#fff;font-size:0.95rem;font-weight:700;">New Era University Library</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:32px;flex-wrap:wrap;text-align:center;">
+      <div>
+        <div style="color:var(--neu-gold);font-weight:600;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;">Library Hours</div>
+        <div>Mon – Fri: 7:00 AM – 5:00 PM</div>
+        <div>Saturday: 8:00 AM – 5:00 PM</div>
+      </div>
+      <div>
+        <div style="color:var(--neu-gold);font-weight:600;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;">Contact</div>
+        <div>library@neu.edu.ph</div>
+      </div>
+      <div>
+        <div style="color:var(--neu-gold);font-weight:600;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;">Location</div>
+        <div>9 Central Ave., New Era,</div>
+        <div>Quezon City 1107</div>
+      </div>
+    </div>
+    <div style="text-align:right;opacity:0.5;font-size:0.75rem;">&copy; <span id="footerYear"></span> New Era University<br>All rights reserved.</div>
+  </div>
+</footer>
+
+<script>document.getElementById('footerYear').textContent = new Date().getFullYear();
+  function openDeleteModal(title, message, onConfirm) {
+  document.getElementById('deleteModalTitle').textContent = title;
+  document.getElementById('deleteModalMsg').textContent = message;
+  document.getElementById('deleteModalConfirmBtn').onclick = function() {
+    closeDeleteModal();
+    onConfirm();
+  };
+  const modal = document.getElementById('deleteModal');
+  modal.style.display = 'flex';
+}
+
+function closeDeleteModal() {
+  document.getElementById('deleteModal').style.display = 'none';
+}
+
+// Close when clicking dark backdrop
+document.getElementById('deleteModal').addEventListener('click', function(e) {
+  if (e.target === this) closeDeleteModal();
+});
+</script>
+
+</body>
+</html>
