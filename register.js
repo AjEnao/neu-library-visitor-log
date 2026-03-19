@@ -138,13 +138,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const studentNumGroup = document.getElementById('studentNumber').closest('.form-group');
     clearErr('collegeError');
 
-    // Hide student number for Faculty/Staff
+    // Hide student number and year level for Faculty/Staff
     if (college === 'Faculty / Staff') {
       studentNumGroup.style.display = 'none';
       document.getElementById('studentNumber').value = '';
       clearErr('studentNumError');
+      document.getElementById('yearLevelGroup').style.display = 'none';
+      document.getElementById('yearLevel').value = 'Faculty / Staff';
     } else {
       studentNumGroup.style.display = '';
+      document.getElementById('yearLevelGroup').style.display = '';
+      if (document.getElementById('yearLevel').value === 'Faculty / Staff') {
+        document.getElementById('yearLevel').value = '';
+      }
     }
 
     programSelect.innerHTML = '';
@@ -224,7 +230,7 @@ async function handleRegister() {
     showErr('studentNumError', 'Invalid format. Use: 24-10942-984');
     valid = false;
   }
-  if (!yearLevel)            { showErr('yearError');    valid = false; }
+  if (!isFaculty && !yearLevel)  { showErr('yearError');    valid = false; }
   if (!college)              { showErr('collegeError'); valid = false; }
   if (!program)              { showErr('programError'); valid = false; }
   if (!valid) return;
