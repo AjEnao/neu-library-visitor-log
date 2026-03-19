@@ -5,6 +5,8 @@
 import { db, auth } from "./firebase.js";
 import {
   signInWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
   signOut,
   onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -33,16 +35,20 @@ document.head.appendChild(sh);
 // =============================================
 //  AUTH STATE — auto login/logout transitions
 // =============================================
-onAuthStateChanged(auth, user => {
-  if (user) {
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('dashScreen').classList.remove('hidden');
-    startDashboard(user);
-  } else {
-    document.getElementById('loginScreen').style.display = '';
-    document.getElementById('dashScreen').classList.add('hidden');
-    if (unsubVisits) { unsubVisits(); unsubVisits = null; }
-  }
+// Force sign-out on page load — always require fresh login
+// =============================================
+signOut(auth).then(() => {
+  onAuthStateChanged(auth, user => {
+    if (user) {
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('dashScreen').classList.remove('hidden');
+      startDashboard(user);
+    } else {
+      document.getElementById('loginScreen').style.display = '';
+      document.getElementById('dashScreen').classList.add('hidden');
+      if (unsubVisits) { unsubVisits(); unsubVisits = null; }
+    }
+  });
 });
 
 // =============================================
@@ -59,6 +65,9 @@ document.addEventListener('DOMContentLoaded', () => {
     ?.addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
   document.getElementById('eyeBtn')
     ?.addEventListener('click', togglePass);
+
+  document.getElementById('adminGoogleBtn')
+    ?.addEventListener('click', handleGoogleLogin);
 
   // Logout
   document.getElementById('logoutBtn')
@@ -198,6 +207,37 @@ function togglePass() {
   }
 }
 
+async function handleGoogleLogin() {
+  const err = document.getElementById('loginError');
+  err.classList.add('hidden');
+
+  // Only these emails are allowed as admins
+  const ALLOWED_ADMINS = [
+    'aj.enao@neu.edu.ph',
+    'jcesperanza@neu.edu.ph'
+  ];
+
+  try {
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ hd: 'neu.edu.ph' });
+    const result = await signInWithPopup(auth, provider);
+    const email  = result.user.email?.toLowerCase();
+
+    if (!ALLOWED_ADMINS.includes(email)) {
+      await signOut(auth);
+      err.textContent = 'Access denied. Your account is not authorized as an admin.';
+      err.classList.remove('hidden');
+      return;
+    }
+    // onAuthStateChanged handles the rest
+  } catch (e) {
+    if (e.code !== 'auth/popup-closed-by-user') {
+      err.textContent = 'Google sign-in failed: ' + e.message;
+      err.classList.remove('hidden');
+    }
+  }
+}
+
 async function handleLogout() {
   await signOut(auth);
   window.location.href = 'index.html';
@@ -317,6 +357,7 @@ async function renderVisitTable(records) {
         <div class="name-main">${esc(r.name || '')}</div>
         <div class="name-email" style="font-size:.72rem;color:#b0bad0;">${esc(r.yearLevel || '')}</div>
       </td>
+      <td><div class="name-email" style="font-size:.82rem;font-weight:500">${esc(r.studentNumber || '—')}</div></td>
       <td><div class="name-email">${esc(r.email || '')}</div></td>
       <td><span class="badge badge-${r.type||'student'}">${cap(r.type||'student')}</span></td>
       <td>${esc(r.reason || '')}</td>
@@ -326,18 +367,20 @@ async function renderVisitTable(records) {
         <div class="name-email">${esc(r.program || '')}</div>
       </td>
       <td>
-        <button class="btn-del" data-id="${r.firestoreId}">Delete</button>
-        ${isBlocked
-          ? `<span class="blocked-tag">BLOCKED</span>`
-          : `<button class="btn-block" data-email="${esc(r.email||'')}">Block</button>`
-        }
+        <div class="action-btns">
+          <button class="btn-del" data-id="${r.firestoreId}" data-name="${esc(r.name||'')}" data-email="${esc(r.email||'')}">Delete</button>
+          ${isBlocked
+            ? `<span class="blocked-tag">BLOCKED</span>`
+            : `<button class="btn-block" data-email="${esc(r.email||'')}">Block</button>`
+          }
+        </div>
       </td>
     `;
     tbody.appendChild(tr);
   });
 
   tbody.querySelectorAll('.btn-del').forEach(btn =>
-    btn.addEventListener('click', () => openDelete(btn.dataset.id))
+    btn.addEventListener('click', () => openDelete(btn.dataset.id, btn.dataset.name, btn.dataset.email))
   );
 
   tbody.querySelectorAll('.btn-block').forEach(btn =>
@@ -386,8 +429,9 @@ function filterTable() {
 }
 
 // ── Delete ──────────────────────────────────────
-function openDelete(id) {
-  deleteTarget = id;
+function openDelete(firestoreId, name, email) {
+  deleteTarget = { firestoreId, email };
+  document.getElementById('deleteTargetName').textContent = name || email || '';
   document.getElementById('deleteModal').classList.remove('hidden');
 }
 function closeDelete() {
@@ -396,8 +440,21 @@ function closeDelete() {
 }
 async function confirmDelete() {
   if (!deleteTarget) return;
+  const { firestoreId, email } = deleteTarget;
   try {
-    await deleteDoc(doc(db, 'visits', deleteTarget));
+    // Delete visit record
+    await deleteDoc(doc(db, 'visits', firestoreId));
+
+    // Also delete user account from users collection
+    if (email) {
+      const { query: fsQuery, where: fsWhere, getDocs: fsGetDocs, deleteDoc: fsDel, doc: fsDoc }
+        = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+      const userSnap = await fsGetDocs(fsQuery(collection(db, 'users'), fsWhere('email', '==', email.toLowerCase())));
+      for (const d of userSnap.docs) {
+        await fsDel(fsDoc(db, 'users', d.id));
+      }
+    }
+
     closeDelete();
   } catch (e) {
     alert('Delete failed: ' + e.message);
@@ -411,6 +468,7 @@ function exportPDF() {
     return `<tr>
       <td>${i+1}</td>
       <td><strong>${esc(r.name||'')}</strong><br><span style="font-size:10px;color:#888">${esc(r.yearLevel||'')}</span></td>
+      <td>${esc(r.studentNumber||'—')}</td>
       <td>${esc(r.email||'')}</td>
       <td>${cap(r.type||'student')}</td>
       <td>${esc(r.reason||'')}</td>
@@ -441,7 +499,7 @@ function exportPDF() {
     <table class="print-table">
       <thead>
         <tr>
-          <th>#</th><th>Name</th><th>Email</th><th>Type</th>
+          <th>#</th><th>Name</th><th>Student No.</th><th>Email</th><th>Type</th>
           <th>Purpose</th><th>Date &amp; Time</th><th>College / Program</th>
         </tr>
       </thead>
@@ -733,9 +791,6 @@ async function confirmUnblock() {
   }
 }
 
-// =============================================
-//  HELPERS
-// =============================================
 function formatTime(date) {
   return date.toLocaleString('en-PH', {
     month:'numeric', day:'numeric', year:'numeric',

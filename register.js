@@ -98,7 +98,35 @@ const PROGRAMS = {
   ]
 };
 
-// ── Init ──────────────────────────────────────
+// ── Student number auto-format ────────────────
+function formatStudentNumber(input) {
+  // Remove non-digits
+  let val = input.value.replace(/\D/g, '');
+
+  // Auto-insert dashes: XX-XXXXX-XXX
+  if (val.length > 2)  val = val.slice(0,2) + '-' + val.slice(2);
+  if (val.length > 8)  val = val.slice(0,8) + '-' + val.slice(8);
+  if (val.length > 12) val = val.slice(0,12);
+
+  input.value = val;
+
+  // Live validation
+  const err = document.getElementById('studentNumError');
+  if (val.length > 0 && !validateStudentNumber(val)) {
+    err.style.display = 'block';
+    input.classList.add('invalid');
+  } else {
+    err.style.display = 'none';
+    input.classList.remove('invalid');
+  }
+}
+
+function validateStudentNumber(val) {
+  return /^\d{2}-\d{5}-\d{3}$/.test(val);
+}
+
+// Expose to HTML
+window.formatStudentNumber = formatStudentNumber;
 document.getElementById('footerYear').textContent = new Date().getFullYear();
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -107,7 +135,17 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('regCollege').addEventListener('change', function () {
     const programSelect = document.getElementById('regProgram');
     const college       = this.value;
+    const studentNumGroup = document.getElementById('studentNumber').closest('.form-group');
     clearErr('collegeError');
+
+    // Hide student number for Faculty/Staff
+    if (college === 'Faculty / Staff') {
+      studentNumGroup.style.display = 'none';
+      document.getElementById('studentNumber').value = '';
+      clearErr('studentNumError');
+    } else {
+      studentNumGroup.style.display = '';
+    }
 
     programSelect.innerHTML = '';
     if (!college) {
@@ -134,11 +172,11 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Live clear errors
-  document.getElementById('fullName').addEventListener('input',  () => clearErr('nameError'));
-  document.getElementById('regEmail').addEventListener('input',  () => clearErr('emailError'));
-  document.getElementById('yearLevel').addEventListener('change',() => clearErr('yearError'));
-  document.getElementById('regCollege').addEventListener('change',()=> clearErr('collegeError'));
-  document.getElementById('regProgram').addEventListener('change',()=> clearErr('programError'));
+  document.getElementById('fullName').addEventListener('input',   () => clearErr('nameError'));
+  document.getElementById('regEmail').addEventListener('input',   () => clearErr('emailError'));
+  document.getElementById('yearLevel').addEventListener('change', () => clearErr('yearError'));
+  document.getElementById('regCollege').addEventListener('change',() => clearErr('collegeError'));
+  document.getElementById('regProgram').addEventListener('change',() => clearErr('programError'));
 
   // Register button
   document.getElementById('registerBtn').addEventListener('click', handleRegister);
@@ -171,15 +209,21 @@ function validateEmail(v) {
 async function handleRegister() {
   clearAll();
 
-  const fullName = document.getElementById('fullName').value.trim();
-  const email    = document.getElementById('regEmail').value.trim().toLowerCase();
-  const yearLevel= document.getElementById('yearLevel').value;
-  const college  = document.getElementById('regCollege').value;
-  const program  = document.getElementById('regProgram').value;
+  const fullName    = document.getElementById('fullName').value.trim();
+  const email       = document.getElementById('regEmail').value.trim().toLowerCase();
+  const studentNum  = document.getElementById('studentNumber').value.trim();
+  const yearLevel   = document.getElementById('yearLevel').value;
+  const college     = document.getElementById('regCollege').value;
+  const program     = document.getElementById('regProgram').value;
+  const isFaculty   = college === 'Faculty / Staff';
 
   let valid = true;
   if (!fullName)             { showErr('nameError');    valid = false; }
   if (!validateEmail(email)) { showErr('emailError');   valid = false; }
+  if (!isFaculty && !validateStudentNumber(studentNum)) {
+    showErr('studentNumError', 'Invalid format. Use: 24-10942-984');
+    valid = false;
+  }
   if (!yearLevel)            { showErr('yearError');    valid = false; }
   if (!college)              { showErr('collegeError'); valid = false; }
   if (!program)              { showErr('programError'); valid = false; }
@@ -210,6 +254,7 @@ async function handleRegister() {
     await addDoc(collection(db, 'users'), {
       fullName,
       email,
+      studentNumber: studentNum,
       yearLevel,
       college,
       program,
